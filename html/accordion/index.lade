@@ -1,0 +1,8 @@
+import<../head.lade>
+		div (controller:"demo")
+			div [style:"margin:10px;"] (strap-accordion:"accordion" strap-accordion-only:"1" strap-accordion-child:"panel-primary" strap-accordion-select:"panel-info")
+			button (click:"change") "change"
+				
+
+
+	script [src:"./index.js"]

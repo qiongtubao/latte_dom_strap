@@ -1,0 +1,7 @@
+import<../head.lade>
+		div (controller:"demo")
+			div (strap-aside:"aside" )
+				
+
+
+	script [src:"./index.js"]

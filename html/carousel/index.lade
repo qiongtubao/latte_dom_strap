@@ -1,0 +1,7 @@
+import<../head.lade>
+		div (controller:"demo")
+			div (strap-carousel:"aside" )
+				
+
+
+	script [src:"./index.js"]
