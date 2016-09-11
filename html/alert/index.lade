@@ -1,7 +1,7 @@
 import<../head.lade>
 		div (controller:"demo")
-			div (strap-alert:"alert" )
-				
+			div.latte_alert (strap-alert:"alert" )
+			button (click:"showAlert") "showAlert"
 
-
+	link [rel:'stylesheet' href:'./index.css']
 	script [src:"./index.js"]

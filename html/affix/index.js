@@ -4,15 +4,17 @@ var latte_lib = latte.require("latte_lib");
 	accordion  
 		{
 			list: Array
-			select:
+			active: Int
 		}
 */
   var data = latte_lib.object.create({
     affix: {
     	list:[{
-    		href: "a"
+    		href: "#a",
+        text: "a"
     	},{
-    		href: "b"
+    		href: "#b",
+        text: "b"
     	}]
     	
 	}

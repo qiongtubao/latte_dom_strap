@@ -6,13 +6,13 @@ function(require, exports, module, window) {
 	/**
 		dom
 			@param latte-strap-accordion-only boolean
-			@param latte-strap-accordion-select String ["panel-primary"]  
+			@param latte-strap-accordion-active String ["panel-primary"]  
 			@param latte-strap-accordion-child String ["panel-primarys"]
 			@param  latte-strap-accordion  String
 
 		data 
 			@param list
-			@param select
+			@param active
 	*/
 	var cd = function() {
 		var div = document.createElement("div");
@@ -21,8 +21,8 @@ function(require, exports, module, window) {
 	this.beforeLevel = 2;
 	this.before = function(data, dom, controller) {
 		var accordion = dom.attr("latte-strap-accordion");
-		var selectClassName = dom.attr("latte-strap-accordion-select") || "panel-primary";
-		var childClassName = dom.attr("latte-strap-accordion-child") || "panel-info";
+		var selectClassName = dom.attr("latte-strap-accordion-active") || "panel-primary";
+		var childClassName = dom.attr("latte-strap-accordion-default") || "panel-info";
 		var only = dom.attr("latte-strap-accordion-only");
 		if(accordion) {
 							var span = document.createElement("span");
@@ -42,11 +42,11 @@ function(require, exports, module, window) {
 
 					var child = cd();
 					child.className = "panel";
-					child.setAttribute("latte-class", "{{selectClass}}");
+					child.setAttribute("latte-class", "{{activeClass}}");
 					child.appendChild(header);
 					child.appendChild(body);
 				var div = cd();
-				div.setAttribute("latte-class", "{{selectClass}}");
+				//div.setAttribute("latte-class", "{{activeClass}}");
 				div.appendChild(child);
 				div.setAttribute("latte-list", "list");
 			dom.appendChild(div);
@@ -61,27 +61,27 @@ function(require, exports, module, window) {
 
 				accirdionData.get("list").forEach(function(o, index) {
 					//if(!o.get("selectClass")) {
-						o.set("selectClass", childClassName);
+						o.set("activeClass", childClassName);
 					//}
 					o.set("click", function() {
-						accirdionData.set("select", index);
+						accirdionData.set("active", index);
 					});	
 				});
 					var doSelect = function(select) {
 						if(select == null) { return; }
 						accirdionData.get("list").forEach(function(o) {
-								o.set("selectClass", childClassName);
+								o.set("activeClass", childClassName);
 								if(only) {
 									o.set("show", false);
 								}
 							});
 						var selectObject = accirdionData.get("list."+select);
-						selectObject.set("selectClass", selectClassName);
+						selectObject.set("activeClass", selectClassName);
 						selectObject.set("show", true);
-						console.log(selectObject.get("show"));
+						
 					}
-				doSelect(accirdionData.get("select"));
-				controller.bind("data", accordion+".select", doSelect);
+				doSelect(accirdionData.get("active"));
+				data.on( accordion+".active", doSelect);
 				
 				dom.html("");
 				var d = div.cloneNode(true);
@@ -94,7 +94,7 @@ function(require, exports, module, window) {
 			
 		}
 	}
-	require("latte_dom/utils/css.js").importCssString(require("./accordion.css"), "latte_layout_loading1_css");
+	//require("latte_dom/utils/css.js").importCssString(require("./accordion.css"), "latte_layout_loading1_css");
 
 }).call(module.exports);
 });
@@ -104,13 +104,110 @@ define("latte_dom/c/commands/affix.js", ["require", "exports", "module", "window
 function(require, exports, module, window) {
 (function() {
 	//导航栏
+	//暂时还没加回到顶部
+	var cd = function(name) {
+		return document.createElement(name || "div");
+	}
+	var getXY = function(e) {
+		var t=e.offsetTop;   
+	    var l=e.offsetLeft;   
+	    var height=e.offsetHeight;   
+	    while(e=e.offsetParent){
+	         t+=e.offsetTop;   
+	         l+=e.offsetLeft;   
+     	}
+     	return {
+     		x: l,
+     		y: t
+     	};
+	}
 	this.before = function(data, dom, controller) {
 		var affix = dom.attr("latte-strap-affix");
+		var selectClassName = dom.attr("latte-strap-affix-active") || "latte_active";
 		if(affix) {
-			
-			//controller.bind("data", affix+".select", doSelect);
+								var a = cd("a");
+								a.setAttribute("latte-href", "{{href}}");
+								a.setAttribute("latte-html", "{{text}}");
+								a.setAttribute("latte-click", "click");
+							var li = cd("li");
+							li.appendChild(a);
+							li.setAttribute("latte-class", "{{activeClass}}");
+						var ul = cd("ul");
+						ul.className = "nav";
+						ul.setAttribute("latte-list", "list");
+						ul.appendChild(li);
+					var div = cd("nav");
+					div.className = "affix";
+					div.appendChild(ul);
+
+				dom.appendChild(div);
+			var change = function(value, old) {
+				var Controller = require("../controller.js");
+				if(old) {
+					Controller.removeChild(dom, old);
+					var list = old.get(list)
+					if(list) {
+						
+						window.removeEventListener("scroll", o.get("scroll"));
+					}
+				}
+				var doms = [];
+				value.get("list").forEach(function(o, index) {
+					o.set("activeClass", "");					
+					o.set("click", function() {
+						value.set("active", index);
+					});
+					//var dom = document.querySelector(o.get("href"));
+					doms[index] = o.get("href");
+				});
+				value.set("scroll", function(e) {
+				
+					var index 
+					var domJ = 9999999999;
+					doms.forEach(function(href, i) {
+						var o = document.querySelector(href);
+						if(!o) {
+							return
+						}
+						var xy = getXY(o);
+						var j = (xy.y - window.pageYOffset)*(xy.y - window.pageYOffset)
+						 + (xy.x - window.pageXOffset) * (xy.x - window.pageXOffset)
+						
+						if(j < domJ) {
+							domJ = j;
+							index = i;
+						}
+					});
+					value.set('active', index);
+				});
+				
+				window.addEventListener("scroll", value.get("scroll"));
+				var doSelect = function(select, old) {
+					if(select == old) {
+						return;
+					}
+					if(select == null) { return; }
+					value.get("list").forEach(function(o) {
+						o.set("activeClass", "");
+					});
+					var selectObject = value.get("list."+select);
+					selectObject.set("activeClass", selectClassName);									
+				}
+				doSelect(value.get("active"));
+				data.on( affix+".active", doSelect);
+				
+				dom.html("");
+				var d = div.cloneNode(true);
+				dom.appendChild(div);
+				Controller.createChild(dom, value);
+			};
+
+			change(data.get(affix));
+			controller.bind('data', affix, change);
 		}
 	}
+	//require("latte_dom/utils/css.js").importCssString(require("./affix.css"), "latte_strap_affix_css");
+
 }).call(module.exports);
 });
 })(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
@@ -118,9 +215,66 @@ function(require, exports, module, window) {
 define("latte_dom/c/commands/alert.js", ["require", "exports", "module", "window"],
 function(require, exports, module, window) {
 (function() {
-	//导航栏
+	//弹窗
+		var cd = function(name) {
+			return document.createElement(name || "div");
+		}
 	this.before = function(data, dom, controller) {
-		
+		var alert = dom.attr("latte-strap-alert");
+		if(alert) {
+							var span = cd("span");
+							span.innerHTML = "x";
+						var button = cd("button");
+						button.setAttribute("type", "button");
+						button.setAttribute("latte-click", "click");
+						button.className = "close";
+						button.appendChild(span);
+
+						var span = cd("span");
+						span.className = "icon-info-circled alert-icon-float-left";
+						var strong = cd("strong");
+						strong.setAttribute("latte-html", "{{title}}");
+						var p = cd("p");
+						p.setAttribute("latte-html", "{{body}}");
+					
+				var div = cd();
+				div.className = "fade-transition alert alert-success top fade-leave";
+				div.appendChild(button);
+				div.appendChild(span);
+				div.appendChild(strong);
+				div.appendChild(p);
+				//div.style["width"] = "400px";
+				div.setAttribute("latte-show", "show");
+			dom.appendChild(div);
+
+			var change = function(value, old) {
+				var Controller = require("../controller.js");
+				if(old) {
+					Controller.removeChild(dom, old);
+				}
+				var timer;
+				value.set("click", function() {
+					if(timer) {
+						clearTimeout(timer);
+					}
+					value.set("show", false);
+				});
+				value.show = function(time) {
+					if(timer) { return; }
+					value.set("show", true);
+					timer = setTimeout(function() {
+						value.set("show", false);
+						timer = null;
+					}, time || 3000);
+				};
+				dom.html("");
+				var clone = div.cloneNode(true);
+				dom.appendChild(clone);
+				Controller.createChild(dom, value);
+			};	
+			change(data.get(alert));
+			controller.bind('data', alert, change);
+		}
 	}
 }).call(module.exports);
 });

@@ -4,20 +4,17 @@ var latte_lib = latte.require("latte_lib");
 	accordion  
 		{
 			list: Array
-			select:
+			active:
 		}
 */
   var data = latte_lib.object.create({
     alert: {
     	type: "error",
-    	text: ""
+    	title: "Well Done!",
+    	body: "You successfully read this important alert message."
 	},
-	show: function() {
-		this.set("alert.show", 1);
-		
-		setTimeout(function() {
-			data.set("alert.show", 0)
-;		}, 2000);
+	showAlert: function() {
+		this.get("alert").show();
 	}
   });
   var box = latte_dom.define("demo", data);

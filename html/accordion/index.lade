@@ -1,6 +1,6 @@
 import<../head.lade>
 		div (controller:"demo")
-			div [style:"margin:10px;"] (strap-accordion:"accordion" strap-accordion-only:"1" strap-accordion-child:"panel-primary" strap-accordion-select:"panel-info")
+			div [style:"margin:10px;"] (strap-accordion:"accordion" strap-accordion-only:"1" strap-accordion-default:"panel-primary" strap-accordion-active:"panel-info")
 			button (click:"change") "change"
 				
 
