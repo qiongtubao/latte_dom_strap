@@ -7,4 +7,17 @@
 
 	data 
 		@param list  Array
-		@param select  Int
+		@param active  Int
+
+
+#affix
+	dom 
+		@param latte-strap-affix String
+	data 
+		@param list Array
+			{
+				href: String
+				text: String
+			}
+		@param active Int
+	
