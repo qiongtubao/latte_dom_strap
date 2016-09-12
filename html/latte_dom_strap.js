@@ -388,11 +388,10 @@ function(require, exports, module, window) {
 });
 })(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
 (function(define) {'use strict'
-define("latte_dom/c/commands/buttonGroup.js", ["require", "exports", "module", "window"],
+define("latte_dom/c/commands/buttonGroups/radio.js", ["require", "exports", "module", "window"],
 function(require, exports, module, window) {
 (function() {
-	//导航栏
-	this.before = function(data, dom, controller) {
+	this.create = function(data, dom, controller) {
 		
 	}
 }).call(module.exports);
@@ -413,11 +412,86 @@ function(require, exports, module, window) {
 define("latte_dom/c/commands/checkbox.js", ["require", "exports", "module", "window"],
 function(require, exports, module, window) {
 (function() {
-	//导航栏
+
+	var cd = function(name) {
+		return document.createElement(name || "div");
+	}	
 	this.before = function(data, dom, controller) {
-		
+		var checkbox = dom.attr("latte-strap-checkbox");
+		var type = dom.attr("latte-strap-checkbox-type");
+		if(checkbox) {
+								var inputDom = cd("input");
+								inputDom.setAttribute("type", "checkbox");
+								inputDom.setAttribute("latte-value", "{{value}}");
+								inputDom.setAttribute("latte-disabled", "disabled");
+								inputDom.setAttribute("latte-checkbox-checked", "checked");
+								//暂时未添加class 判断以及运算  表达式
+								inputDom.setAttribute("latte-class", "{! disabled? disabled: !}");
+								var spanDom = cd("span");
+								spanDom.setAttribute("latte-html", "{{text}}");
+
+							var label = cd("label");	
+							label.appendChild(inputDom);
+							label.appendChild(spanDom);
+						var checkboxDom = cd();
+						checkboxDom.className = "checkbox";
+						checkboxDom.appendChild(label);
+
+						var div = cd();
+						
+						div.setAttribute("latte-list", "list");
+						div.appendChild(checkboxDom);
+						//固定inline 
+					dom.appendChild(div);
+				var change = function(value, old) {
+					var Controller = require("../controller.js");
+					if(old) {
+						Controller.removeChild(dom, old);
+					}
+					dom.html("");
+					dom.appendChild(div);
+					value.value = function() {
+						var map = [];
+						 value.get("list").forEach(function(o){
+							if(o.get("checked")) {
+								map.push(o.get("value"));
+							}
+						});
+						 return map;
+					}
+					Controller.createChild(dom, value);
+				}
+			change(data.get(checkbox));
+			controller.bind("data", checkbox, change);
+		}
 	}
 }).call(module.exports);
+});
+})(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
+(function(define) {'use strict'
+define("latte_dom/c/commands/checked.js", ["require", "exports", "module", "window"],
+function(require, exports, module, window) {
+	(function() {
+		this.after = function(data, dom, controller) {
+			var checked = dom.attr("latte-checkbox-checked");
+			if(checked) {
+				
+				var click = function(event) {
+					//console.log(dom.node().checked);
+					data._set(checked, dom.node().checked);
+				};
+				var change = function(value) {
+					//dom.attr("checked", value);
+					dom.node().checked = value;
+				};
+				change(data.get(checked));
+				controller.bind("data", checked, change);
+				controller.bind("view", "click", click);
+			}
+		};
+	}).call(module.exports);
+	
+
 });
 })(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
 (function(define) {'use strict'
@@ -429,6 +503,26 @@ function(require, exports, module, window) {
 		
 	}
 }).call(module.exports);
+});
+})(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
+(function(define) {'use strict'
+define("latte_dom/c/commands/disabled.js", ["require", "exports", "module", "window"],
+function(require, exports, module, window) {
+
+	(function() {
+		this.after = function(data, dom, controller) {
+			var disabled = dom.attr("latte-disabled");
+			if(disabled) {
+				var change = function(value, old) {
+					value ? dom.attr("disabled", true): dom.attr("disabled");
+				}
+				change(data.get(disabled));
+				controller.bind("data", disabled, change);
+			}
+		};
+	}).call(module.exports);
+	
+
 });
 })(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
 (function(define) {'use strict'
@@ -479,9 +573,90 @@ function(require, exports, module, window) {
 define("latte_dom/c/commands/radio.js", ["require", "exports", "module", "window"],
 function(require, exports, module, window) {
 (function() {
-	//导航栏
+	//暂时没有绑定name 限定   
+	var cd = function(name) {
+		return document.createElement(name || "div");
+	}
 	this.before = function(data, dom, controller) {
-		
+		var radio = dom.attr("latte-strap-radio");	
+		if(radio) {
+								var inputDom = cd("input");
+								inputDom.setAttribute("type", "radio");	
+								inputDom.setAttribute("latte-value", "{{value}}");
+								inputDom.setAttribute("latte-disabled", "disabled");
+								inputDom.setAttribute("latte-click", "click");
+								inputDom.setAttribute("latte-checkbox-checked", "checked");
+								inputDom.setAttribute("latte-class", "{! disabled? disabled: !}");						
+								inputDom.setAttribute("latte-name", "name");
+
+								var spanDom = cd("span");
+								spanDom.setAttribute("latte-html", "{{text}}");
+
+							var labelDom = cd("label");
+							labelDom.appendChild(inputDom);
+							labelDom.appendChild(spanDom);
+
+
+						var radioDom = cd();
+						radioDom.className = "radio";
+						radioDom.appendChild(labelDom);
+					var div = cd("form");
+					
+					div.setAttribute("latte-list", "list");
+					div.appendChild(radioDom);
+			var change = function(value, old) {
+				var Controller = require("../controller.js");
+				if(old) {
+					Controller.removeChild(dom, old);
+				}
+				dom.html("");
+				var copy = div.cloneNode(true);
+				dom.appendChild(copy);
+				value.value = function() {
+					return value.get("list."+value.get("radio")+".value");
+				}
+
+				value.get("list").forEach(function(o, index) {
+					o.set("click", function() {
+						value.set("radio", index);
+					});
+					o.set("name", value.get("name"));
+				});
+				var changeRadio = function(now, old) {
+
+					value.get("list").forEach(function(o) {
+						o.set("checked", false);
+					});
+					if(!now) { return;}
+					value.set("list."+now+".checked", true);
+				};
+				//vlaue.get("list").on("push"); add event
+				changeRadio(value.get("radio"));
+				value.on("radio", changeRadio);
+				Controller.createChild(dom, value);
+			}
+			change(data.get(radio));
+			controller.bind("data", radio, change);
+
+		}
+	}
+}).call(module.exports);
+});
+})(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
+(function(define) {'use strict'
+define("latte_dom/c/commands/radioName.js", ["require", "exports", "module", "window"],
+function(require, exports, module, window) {
+(function() {
+	this.after = function(data, dom, controller) {
+		var name =  dom.attr("latte-name");
+		if(name) {
+			
+			var change = function(value, old) {
+				dom.node().name = value;
+			};
+			change(data.get(name));
+			controller.bind("data", name, change);
+		}
 	}
 }).call(module.exports);
 });
