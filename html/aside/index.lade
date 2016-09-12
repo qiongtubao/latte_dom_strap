@@ -1,7 +1,10 @@
 import<../head.lade>
 		div (controller:"demo")
-			div (strap-aside:"aside" )
-				
+			div.aside_demo (strap-aside:"aside" strap-aside-sync:"right")
+					h4 "Text in aside"
+					p "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+					p " Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+			button (click:"show") "show"
 
-
+	link [rel:'stylesheet' href:'./index.css']
 	script [src:"./index.js"]
