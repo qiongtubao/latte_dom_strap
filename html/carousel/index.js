@@ -13,12 +13,24 @@ var latte_lib = latte.require("latte_lib");
     carousel: {
     	interval: 5000,
     	list: [{
-    		image: "",
-    		text: "",
+    		image: "https://placehold.it/1200x500?text=one",
+    		text: "标签 1",
     		click: function() {
 
     		}
-    	}],
+    	},{
+        image: "https://placehold.it/1200x500?text=two",
+        text: "标签 2",
+        click: function() {
+
+        }
+      },{
+        image: "https://placehold.it/1200x500?text=three",
+        text: "标签 3",
+        click: function() {
+
+        }
+      }]
     	
 	}
   });
