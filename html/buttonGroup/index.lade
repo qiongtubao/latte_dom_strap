@@ -1,7 +1,6 @@
 import<../head.lade>
 		div (controller:"demo")
 			div (strap-checkbox:"checkbox" )
-
 			button (click:"checkClick") "value"
 			div (strap-radio:"radio" strap-radio-type:"inline")
 			button (click:"radioClick") "value"

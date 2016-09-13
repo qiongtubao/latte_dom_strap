@@ -1,7 +1,0 @@
-import<../head.lade>
-		div (controller:"demo")
-			div (strap-aside:"checkbox" )
-				
-
-
-	script [src:"./index.js"]

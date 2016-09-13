@@ -1,0 +1,7 @@
+import<../head.lade>
+		div (controller:"demo")
+			div (strap-datepicker:"datepicker" )
+			
+
+	link [rel:'stylesheet' href:'./index.css']
+	script [src:"./index.js"]

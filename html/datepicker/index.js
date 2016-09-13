@@ -1,21 +1,14 @@
 var latte_dom = latte.require("latte_dom");
 var latte_lib = latte.require("latte_lib");
 /**
-	accordion  
-		{
-			list: Array
-			select:
-		}
+	轮播插件
+	
 */
   var data = latte_lib.object.create({
-    checkbox: {
-    	type: "button",
-    	data: {
-    		"a":1,
-    		"b":1,
-    		"c":1
-    	}
-    }
+    datepicker: {
+    	format: "yyyy-MM-dd",
+    	time: "2015-06-10"	
+	}
   });
   var box = latte_dom.define("demo", data);
-  console.log(data);
+ 

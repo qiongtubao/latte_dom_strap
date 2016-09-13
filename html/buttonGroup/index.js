@@ -5,7 +5,8 @@ var latte_lib = latte.require("latte_lib");
 		{
 			list: Array
 			select:
-		}
+		},
+  
 */
   var data = latte_lib.object.create({
     checkbox: {
