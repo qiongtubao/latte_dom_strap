@@ -401,13 +401,13 @@ function(require, exports, module, window) {
 define("latte_dom/c/commands/carousel.js", ["require", "exports", "module", "window"],
 function(require, exports, module, window) {
 (function() {
-	//
+	//暂时缺少动画效果
 	var cd = function(name) {
 		return document.createElement(name || "div");
 	};
 	var run = function(value) {
 		value.timer = setTimeout(function() {
-			value.get("right")();
+			value.get(value.get("slide") || "next")();
 			run(value);
 		}, value.get("interval"));
 	}
@@ -426,6 +426,7 @@ function(require, exports, module, window) {
 
 							var img = cd("img")
 							img.setAttribute("latte-src", "{{image}}");
+							img.setAttribute("latte-click", "click");
 							var text = cd();
 							text.className = "carousel-caption";
 							text.setAttribute("latte-html", "{{text}}");
@@ -441,21 +442,21 @@ function(require, exports, module, window) {
 					items.setAttribute("latte-list", "list");
 					items.appendChild(item);
 
-					var left = cd("a");
-					left.className = "carousel-control left"
-					left.innertHTML = "<";
-					left.setAttribute("latte-click", "left");
+					var prev = cd("a");
+					prev.className = "carousel-control left"
+					prev.innertHTML = "<";
+					prev.setAttribute("latte-click", "prev");
 
-					var right = cd("a");
-					right.className = "carousel-control right"; 
-					right.innertHTML = ">";
-					right.setAttribute("latte-click", "right");
+					var next = cd("a");
+					next.className = "carousel-control right"; 
+					next.innertHTML = ">";
+					next.setAttribute("latte-click", "next");
 				var div = cd();
 				div.className = "carousel slide";
 				div.appendChild(ol);
 				div.appendChild(items);
-				div.appendChild(left);
-				div.appendChild(right);
+				div.appendChild(prev);
+				div.appendChild(next);
 			var change = function(value, old) {
 				var Controller = require("../controller.js");
 				if(old) {
@@ -465,9 +466,8 @@ function(require, exports, module, window) {
 				dom.html("");
 				dom.appendChild(div);
 				var changeActive = function(now, old) {
-					console.log(now, old);
+					
 					if(old != null) {
-						console.log(old);
 						value.get("list."+old).set("active", false);
 					} 
 					if(now != null) {
@@ -480,14 +480,14 @@ function(require, exports, module, window) {
 						value.set("active",value.get("list").indexOf(o));
 					});
 				});
-				value.set("left", function() {
+				value.set("prev", function() {
 					var active  = value.get("active") -1;
 					if(active < 0) {
 						active += value.get("list").length;
 					}
 					value.set("active", active);
 				});
-				value.set("right", function() {
+				value.set("next", function() {
 					var active  = value.get("active") +1;
 					if(active > value.get("list").length - 1) {
 						active -= value.get("list").length;

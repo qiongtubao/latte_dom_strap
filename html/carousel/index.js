@@ -5,30 +5,30 @@ var latte_lib = latte.require("latte_lib");
 	carousel
 		{
 			interval: Number  5000
-			pause  : String,
-			wrap: Boolean  true 
+      slide: String [prev, next]
 		}
 */
   var data = latte_lib.object.create({
     carousel: {
     	interval: 5000,
+      slide: "prev",
     	list: [{
     		image: "https://placehold.it/1200x500?text=one",
     		text: "标签 1",
     		click: function() {
-
+          console.log("click 1")
     		}
     	},{
         image: "https://placehold.it/1200x500?text=two",
         text: "标签 2",
         click: function() {
-
+          console.log("click 2")
         }
       },{
         image: "https://placehold.it/1200x500?text=three",
         text: "标签 3",
         click: function() {
-
+          console.log("click 3")
         }
       }]
     	
