@@ -1,0 +1,7 @@
+import<../head.lade>
+		div (controller:"demo")
+			div (strap-modal:"modal" )
+				p (html:"{{p}}")
+			button (click:"showModal") "显示"
+	link [rel:'stylesheet' href:'./index.css']
+	script [src:"./index.js"]

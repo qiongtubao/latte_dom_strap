@@ -284,35 +284,7 @@ define("latte_dom/c/commands/aside.js", ["require", "exports", "module", "window
 function(require, exports, module, window) {
 (function() {
 	//aside
-	var backdrop;
-	var getBackdrop = function() {
-		if(backdrop) {
-			return backdrop;
-		}
-		var backdropDom = document.createElement("div");
-		var View = require("../../v/view.js");
-		backdrop = View.create(backdropDom);
-		backdrop.classed({
-			"aside-backdrop": 1,
-			"ease-fade": 1
-		});
-		document.body.appendChild(backdropDom);
-		backdrop.show = function() {
-			if(!backdrop) {
-				createBackDrop();
-			}
-			backdrop.style("display", "block");
-			//这里需要让它之行css3的动画
-			backdrop.classed("in", 1);
-			return ++self.zIndex;
-		}
-		backdrop.hide = function() {
-			backdrop.style("display", "none");
-			backdrop.classed("in", 0);
-		}
-		backdrop.zIndex = 1040;
-		return backdrop;
-	}
+	var getBackdrop = require("./backdrop").get;
 	var cd = function(name) {
 		return document.createElement(name || "div");
 	}
@@ -384,6 +356,43 @@ function(require, exports, module, window) {
 			controller.bind("data",  aside, change);
 		}
 	}
+}).call(module.exports);
+});
+})(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
+(function(define) {'use strict'
+define("latte_dom/c/commands/backdrop.js", ["require", "exports", "module", "window"],
+function(require, exports, module, window) {
+(function() {
+	var backdrop;
+	var getBackdrop = function() {
+		if(backdrop) {
+			return backdrop;
+		}
+		var backdropDom = document.createElement("div");
+		var View = require("../../v/view.js");
+		backdrop = View.create(backdropDom);
+		backdrop.classed({
+			"aside-backdrop": 1,
+			"ease-fade": 1
+		});
+		document.body.appendChild(backdropDom);
+		backdrop.show = function() {
+			if(!backdrop) {
+				createBackDrop();
+			}
+			backdrop.style("display", "block");
+			//这里需要让它之行css3的动画
+			backdrop.classed("in", 1);
+			return ++self.zIndex;
+		}
+		backdrop.hide = function() {
+			backdrop.style("display", "none");
+			backdrop.classed("in", 0);
+		}
+		backdrop.zIndex = 1040;
+		return backdrop;
+	}
+	this.get = getBackdrop;
 }).call(module.exports);
 });
 })(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
@@ -1077,9 +1086,83 @@ function(require, exports, module, window) {
 define("latte_dom/c/commands/modal.js", ["require", "exports", "module", "window"],
 function(require, exports, module, window) {
 (function() {
-	//导航栏
+	//弹窗
+	var cd = function(name) {
+		return document.createElement(name || "div");
+	};
+	var getBackdrop = require("./backdrop").get;
 	this.before = function(data, dom, controller) {
-		
+		var modal = dom.attr("latte-strap-modal");
+		if(modal){
+			var child = dom.children[0];
+			dom.removeChild(child);
+								var span = cd("span");
+								span.innerHTML = "x";
+								var closeButton = cd("button");
+								closeButton.className = "close";
+								closeButton.setAttribute("latte-click", "close");
+								closeButton.appendChild(span);
+								var titleDom = cd("h4");
+								titleDom.className = "modal-title";
+								titleDom.setAttribute("latte-html", "{{title}}");
+
+							var headerDom = cd();
+							headerDom.className = "modal-header";
+							headerDom.appendChild(closeButton);
+							headerDom.appendChild(titleDom);
+
+							var bodyDom = cd();
+							bodyDom.className = "modal-body";
+							bodyDom.appendChild(child);
+							bodyDom.setAttribute("latte-data", "body");
+
+								var footerOne = cd("button");
+								footerOne.className = "btn btn-default";
+								footerOne.setAttribute("latte-html", "{{text}}");
+								footerOne.setAttribute("latte-click", "click");
+							var footerDom = cd();
+							footerDom.className = "modal-footer";
+							footerDom.setAttribute("latte-list", "footer");
+							footerDom.appendChild(footerOne);
+
+						var contentDom = cd();
+						contentDom.className = "modal-content";
+						contentDom.appendChild(headerDom);
+						contentDom.appendChild(bodyDom);
+						contentDom.appendChild(footerDom);
+
+					var dialogDom = cd();
+					dialogDom.className = "modal-dialog";
+					dialogDom.appendChild(contentDom);
+				var modalDom = cd();
+				modalDom.className = "modal";
+				modalDom.setAttribute("latte-show", "show");
+				modalDom.appendChild(dialogDom);
+				//dom.classed("modal", 1);
+				//dom.attr("latte-show", "show");
+				//dom.appendChild(dialogDom);
+			dom.appendChild(modalDom);
+			//dom.style("height", "100%");
+			var change = function(value, old) {
+				var Controller = require("../controller.js");
+				if(old) {
+					Controller.removeChild(dom, old);
+				}
+				value.on("show", function(n, o) {
+					n? getBackdrop().show(): getBackdrop().hide();
+				});
+				value.set("close", function() {
+					value.set("show", false);
+				});
+				console.log(value, dom);
+				value.show = function() {
+					value.set("show", true);
+				};
+				Controller.createChild(dom, value);
+			};
+			change(data.get(modal));
+			controller.bind("data", modal, change);
+		}
 	}
 }).call(module.exports);
 });
