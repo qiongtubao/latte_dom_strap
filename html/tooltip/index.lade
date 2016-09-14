@@ -1,0 +1,8 @@
+import<../head.lade>
+		div (controller:"demo") [style:"margin:80px;]
+			div (strap-tooltip:"tooltip" )
+				button (click:"click") "click"
+				
+
+	link [rel:'stylesheet' href:'./index.css']
+	script [src:"./index.js"]

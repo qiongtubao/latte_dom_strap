@@ -1,0 +1,54 @@
+.popover {
+	display: block;
+}
+.block {
+	display: block;
+}
+.none  {
+	display: none;
+}
+
+
+.tooltip {
+  opacity: .9
+}
+.fadein-enter {
+  -webkit-animation:fadein-in 0.3s ease-in;
+          animation:fadein-in 0.3s ease-in;
+}
+.fadein-leave {
+  -webkit-animation:fadein-out 0.3s ease-out;
+          animation:fadein-out 0.3s ease-out;
+}
+@-webkit-keyframes fadein-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: .9;
+  }
+}
+@keyframes fadein-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: .9;
+  }
+}
+@-webkit-keyframes fadein-out {
+  0% {
+    opacity: .9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes fadein-out {
+  0% {
+    opacity: .9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
