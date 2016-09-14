@@ -1,0 +1,7 @@
+import<../head.lade>
+		div (controller:"demo")
+			div (strap-dropdown:"dropdown" )
+			
+
+	link [rel:'stylesheet' href:'./index.css']
+	script [src:"./index.js"]
