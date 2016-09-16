@@ -1083,6 +1083,58 @@ function(require, exports, module, window) {
 });
 })(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
 (function(define) {'use strict'
+	define("latte_dom/c/commands/index.css", ["require", "exports", "module", "window"],
+ 	function(require, exports, module, window) {
+ 		module.exports='.block {	display: block;}.none {	display: none;}'
+ 	});
+})(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
+(function(define) {'use strict'
+define("latte_dom/c/commands/index.js", ["require", "exports", "module", "window"],
+function(require, exports, module, window) {
+require("latte_dom/utils/css.js").importCssString(require("./index.css"), "latte_trap_css");
+
+
+document.once = function(type, func, option) {
+	var onceFunc = function() {
+		func();
+		document.removeEventListener(type, onceFunc, option);
+	}
+	document.addEventListener(type, onceFunc, option);
+}
+});
+})(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
+(function(define) {'use strict'
+define("latte_dom/c/commands/keyChange.js", ["require", "exports", "module", "window"],
+function(require, exports, module, window) {
+(function() {
+	this.after = function(data, dom, controller) {
+		
+		var keyChange = dom.attr("latte-keyChange");
+		if(keyChange) {
+			var addEvents = function(now, old) {
+				var Controller = require("../controller.js");
+				if(old) {
+					Controller.remove(dom, old);
+				}
+
+				
+				var keyUp = function(event) {
+					now.call(data, dom.attr("value"));
+				};
+				
+				controller.bind("view", "keyup", keyUp, true);
+				
+				//Controller.create(dom, now);
+			};
+			addEvents(data.get(keyChange));
+			controller.bind("data", keyChange, addEvents);
+		}	
+
+	}
+}).call(module.exports);
+});
+})(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
+(function(define) {'use strict'
 define("latte_dom/c/commands/modal.js", ["require", "exports", "module", "window"],
 function(require, exports, module, window) {
 (function() {
@@ -1411,9 +1463,117 @@ function(require, exports, module, window) {
 define("latte_dom/c/commands/select.js", ["require", "exports", "module", "window"],
 function(require, exports, module, window) {
 (function() {
-	//导航栏
+	//选择
+	//未完成输入型  选择
+	var cd = function(name) {
+		return document.createElement(name || "div");
+	}
 	this.before = function(data, dom, controller) {
-		
+		var select = dom.attr("latte-strap-select");
+		if(select) {	
+								var optionDom = cd("option");
+								optionDom.setAttribute("latte-value", "value");
+								optionDom.setAttribute("latte-html", "{{name}}");
+								
+							var selectDom = cd("select");
+							selectDom.className = "secret";
+							selectDom.appendChild(optionDom);
+							selectDom.setAttribute("latte-list", "list");
+							selectDom.setAttribute("latte-name", "name");
+							selectDom.style["display"] = "none";
+								var btnText = cd("span");
+								btnText.className = "btn-content";
+								btnText.setAttribute("latte-html", "{{selectName}}");
+
+								var caret = cd("span");
+								caret.className = "caret";
+
+							var buttonDom = cd("button");
+							buttonDom.setAttribute("type", "button");
+							buttonDom.className = "form-control dropdown-toggle";
+							buttonDom.setAttribute("latte-click", "click");
+							buttonDom.appendChild(btnText);
+							buttonDom.appendChild(caret);
+											var textDom = cd("span");
+											textDom.setAttribute("latte-html", "{{name}}");
+											var spanDom = cd("span");
+											spanDom.className = "glyphicon glyphicon-ok check-mark none";
+											spanDom.setAttribute("latte-class", "{! select? inline-blok: !}");
+
+										var a = cd("a");
+										a.style["cursor"] = "pointer";
+										a.appendChild(textDom);
+										a.appendChild(spanDom);
+									var li = cd("li");
+									li.appendChild(a);
+									li.style["position"] = "relative";
+									li.setAttribute("latte-click", "click");
+								var ul = cd("ul");
+								
+								ul.setAttribute("latte-list", "list");
+								ul.className = "dropdown-menu block";
+								ul.appendChild(li);
+
+								
+							var ulDom = cd();
+							//ulDom.appendChild(input);
+							ulDom.appendChild(ul);
+							ulDom.setAttribute("latte-show", "show");
+						var dropDownDom = cd();
+						dropDownDom.className = "dropdown";
+						dropDownDom.appendChild(selectDom);
+						dropDownDom.appendChild(buttonDom);
+						dropDownDom.appendChild(ulDom);
+
+					var div = cd();
+					div.className = "btn-select";
+					div.appendChild(dropDownDom)
+				dom.appendChild(div);
+			var change = function(value, old) {
+				var Controller = require("../controller.js");
+				if(old) {
+					Controller.removeChild(dom, old);
+				}
+				value.value = function() {
+					var list = value.get("list");
+					for(var i = 0, len = list.length; i < len; i++) {
+						if(list.get(i+".select")) {
+							return list.get(i+".value") || list.get(i +".name");
+						}
+					}
+				}
+				var select = function(index, old) {
+					if(old != null) {
+						value.set("list."+old+".select", 0);
+					}
+					
+					value.set("list."+index+".select", 1);
+					console.log(value.get("list."+index+".name"));
+					value.set("selectName", value.get("list."+index+".name") );
+				};
+				value.on("select", select);
+				value.select = function(index) {
+					value.set("select", index);
+					selectDom.options[index].selected = 1;
+					value.set("show", false);
+				}
+				value.get("list").forEach(function(o, index) {
+					o.set("click", function() {
+						value.select(index);
+					});
+				});
+				value.set("click", function() {
+					value.set("show", !value.get("show"));
+					document.once("click", function() {
+						value.set("show", false);
+					}, true);
+				});
+				value.select(value.get("select") || "0");
+				Controller.createChild(dom, value);
+			};
+			change(data.get(select));
+			controller.bind("data", select, change);
+		}
 	}
 }).call(module.exports);
 });
@@ -1568,10 +1728,123 @@ function(require, exports, module, window) {
 define("latte_dom/c/commands/typeahead.js", ["require", "exports", "module", "window"],
 function(require, exports, module, window) {
 (function() {
-	//
+	//Typeahead
+	var cd = function(name) {
+		return document.createElement(name || "div");
+	}
 	this.before = function(data, dom, controller) {
-		
+		var typeahead = dom.attr("latte-strap-typeahead");
+		if(typeahead) {
+					var inputDom = cd("input");
+					inputDom.className = "form-control";
+					inputDom.setAttribute("latte-duplex", "value");
+					inputDom.setAttribute("latte-keyChange", "keyChange");
+					inputDom.setAttribute("latte-click", "click");
+								var span = cd("span");
+								span.setAttribute("latte-html", "{{name}}");
+
+							var a = cd("a");
+							a.appendChild(span);
+						var li = cd("li");
+						li.setAttribute("latte-click", "click");
+						li.setAttribute("latte-class", "{!select ? active: !}");
+						li.appendChild(a);
+					var ulDom = cd("ul");
+					ulDom.className = "dropdown-menu block";
+					ulDom.setAttribute("latte-show", "show");
+					ulDom.setAttribute("latte-list", "showList");
+					ulDom.appendChild(li);
+					var div = cd();
+					div.style["position"] = "relative";
+					div.appendChild(inputDom);
+					div.appendChild(ulDom);
+				dom.appendChild(div);
+			var change = function(value, old) {
+				var Controller = require("../controller.js");
+				if(old) {
+					Controller.removeChild(dom, old);
+				}
+				var changeList = function(str) {
+					var list = [];
+					console.log(str);
+					if(str == "" || str == null) {
+						list = value.get("list");
+						console.log(list.length);
+					}else{
+						value.get("list").forEach(function(o) {
+							if(o.get("name").indexOf(str) == 0) {
+								list.push(o)
+							}
+						});
+						
+					}
+
+					
+					
+					value.set("showList", list);
+					value.set("show", !!list.length);
+					if(!!list.length) {
+						document.once("click", function() {
+							value.set("show", false);
+						}, true);
+					}
+				}
+				//console.log(value.get("list").filter);
+				
+				
+				value.set("click", function() {
+					changeList( value.get("value") || "");
+				});
+				
+				value.set("keyChange", function() {
+					//value.set("show", true);
+					changeList(inputDom.value);
+
+				});
+				changeList(value.get("value") );
+				value.set("show", false);
+				Controller.createChild(dom, value);
+				
+			};
+			change(data.get(typeahead));
+			controller.bind("data", typeahead, change);
+
+		}
 	}
 }).call(module.exports);
+});
+})(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
+(function(define) {'use strict'
+define("latte_dom/c/commands/value.js", ["require", "exports", "module", "window"],
+function(require, exports, module, window) {
+
+
+
+	/**
+		<img latte-src="i"></img>
+		一般绑定的是src
+		单项
+
+		音频有问题
+	*/
+	var LatteObject = require("../../m/data.js")
+		, latte_lib = require("latte_lib");
+	var Command = {};
+	(function() {
+		this.after = function(data, view, controller) {
+			var stringContent = view.attr("latte-value");
+			
+			if(stringContent) {
+				var change = function(value) {
+					view.attr("value", value)
+				};
+				change(data.get(stringContent));
+				controller.bind("data", stringContent, change);
+			}
+
+		};
+	}).call(Command);
+	
+	module.exports = Command;
 });
 })(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });

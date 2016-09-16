@@ -1,0 +1,11 @@
+import<../head.lade>
+		div (controller:"demo") [style:"margin:80px;]
+			form [action:"./index.html" method:"get"]
+				div (strap-select:"select" )
+				
+				button.btn.btn-default [type:"submit"] (click:"click") "change"
+			
+			div (strap-select:"select2" strap-select-type:"input")
+
+	link [rel:'stylesheet' href:'./index.css']
+	script [src:"./index.js"]
