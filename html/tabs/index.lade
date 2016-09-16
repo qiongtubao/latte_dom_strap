@@ -1,0 +1,8 @@
+import<../head.lade>
+		div (controller:"demo")
+			div.aside_demo (strap-tabs:"tabs" )
+					
+			button (click:"show") "show"
+
+	link [rel:'stylesheet' href:'./index.css']
+	script [src:"./index.js"]

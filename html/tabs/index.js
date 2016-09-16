@@ -1,25 +1,35 @@
 var latte_dom = latte.require("latte_dom");
 var latte_lib = latte.require("latte_lib");
 /**
-	spinner  
+	tabs  
 		{
-			size: String
+			list: Array
 			select:
 		}
 */
   var data = latte_lib.object.create({
-    spinner: {
-    	text: "hello",
-    	size: "x",
-    	fixed: 1
+    tabs: {
+    	select: 0,
+    	list: [{
+    		title: "a",
+
+    		data: {
+
+    		}
+    	}, {
+    		title: "b",
+    		data: {
+    			
+    		}
+    	}]
 	},
 	show: function() {
-		this.set("spinner.show", 1);
-		var self = this;
+		this.get("aside").show();
+		/**
 		setTimeout(function() {
-			self.set("spinner.show", 0);
-		}, 2000);
-		
+			data.set("alert.show", 0)
+;		}, 2000);
+		*/
 	}
   });
   var box = latte_dom.define("demo", data);

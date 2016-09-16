@@ -347,7 +347,7 @@ function(require, exports, module, window) {
 				});
 				value.show = function() {
 					value.set("show", true);
-					getBackdrop().show();
+					//getBackdrop().show();
 				};
 				Controller.createChild(dom, value);
 			}
@@ -358,6 +358,12 @@ function(require, exports, module, window) {
 	}
 }).call(module.exports);
 });
+})(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
+(function(define) {'use strict'
+	define("latte_dom/c/commands/backdrop.css", ["require", "exports", "module", "window"],
+ 	function(require, exports, module, window) {
+ 		module.exports='.latte-backdrop {  position: fixed;  top: 0;  right: 0;  bottom: 0;  left: 0;  z-index: 1040;  opacity: 0;  -webkit-transition: opacity .3s ease;  transition: opacity .3s ease;  background-color: #000}.latte-backdrop.in {  opacity: .5;  filter: alpha(opacity=50)}'
+ 	});
 })(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
 (function(define) {'use strict'
 define("latte_dom/c/commands/backdrop.js", ["require", "exports", "module", "window"],
@@ -372,7 +378,7 @@ function(require, exports, module, window) {
 		var View = require("../../v/view.js");
 		backdrop = View.create(backdropDom);
 		backdrop.classed({
-			"aside-backdrop": 1,
+			"latte-backdrop": 1,
 			"ease-fade": 1
 		});
 		document.body.appendChild(backdropDom);
@@ -392,6 +398,8 @@ function(require, exports, module, window) {
 		backdrop.zIndex = 1040;
 		return backdrop;
 	}
+	require("latte_dom/utils/css.js").importCssString(require("./backdrop.css"), "latte_trap_backdrop_css");
+
 	this.get = getBackdrop;
 }).call(module.exports);
 });
@@ -1593,34 +1601,54 @@ function(require, exports, module, window) {
 			@param fixed Boolean [0, 1]
 			@param size  String [s, m, l ,xl]
 	*/
-	this.before = function(data, dom, controller) {
-		var spinner = dom.attr("latte-strap-spinner");
-		if(spinner) {
-					var circle = cd();
-					circle.className = "spinner-circle";
+	var cd = function(name) {
+		return document.createElement(name || "div");
+	}
+	var getBackdrop = require("./backdrop").get;
 
-					var text = cd();
-					text.className = "spinner-text";
-					text.setAttribute("latte-html", "{{text}}");
-				var spinner = cd();
-				spinner.className = "spinner-wrapper";
-			var div = cd();
-			div.className = "spinner spinner-gritcode";
-			div.setAttribute("latte-class", "{{size}}")
-			div.appendChild(spinner);
+	this.before = function(data, dom, controller) {
+		var spinnerName = dom.attr("latte-strap-spinner");
+		if(spinnerName) {
+						var circle = cd();
+						circle.className = "spinner-circle";
+
+						var text = cd();
+						text.className = "spinner-text";
+						text.setAttribute("latte-html", "{{text}}");
+					var spinner = cd();
+					spinner.className = "spinner-wrapper";
+					spinner.appendChild(circle)
+					spinner.appendChild(text);
+				var div = cd();
+				div.className = "spinner spinner-gritcode";
+				div.setAttribute("latte-show", "show");
+				div.setAttribute("latte-class", "{{size}}");
+				div.appendChild(spinner);
 			dom.appendChild(div);
 				var change = function(value, old) {
+					var Controller = require("../controller.js");
 					if(old) {
 						Controller.removeChild(dom, old);
 					}
-					dom.html("");
-					dom.appendChild(div);
+					value.on("show", function(value, old) {
+						if(value == old) { return; }
+						value ? getBackdrop().show(): getBackdrop().hide();
+					});
+					value.show = function() {
+						value.set("show", true);
+					}
+					value.hide = function() {
+						value.set("show", false);
+						
+					}	
 					Controller.createChild(dom, value);
 				}
-			controller.bind("data", spinner, change);
+			change(data.get(spinnerName));
+			controller.bind("data", spinnerName, change);
 		}
 	}
-	
+	require("latte_dom/utils/css.js").importCssString(require("./spinner.css"), "latte_trap_spinner_css");
+
 }).call(module.exports);
 });
 })(typeof define === "function"? define: function(name, reqs, factory) { factory(require, exports, module); });
@@ -1628,9 +1656,45 @@ function(require, exports, module, window) {
 define("latte_dom/c/commands/tabs.js", ["require", "exports", "module", "window"],
 function(require, exports, module, window) {
 (function() {
-	//导航栏
+	//tabs
+	var cd = function(name) {
+		return document.createElement(name || "div");
+	}
 	this.before = function(data, dom, controller) {
-		
+		var tabs = dom.attr("latte-strap-tabs");
+		if(tabs) {
+							var aDom = cd("a");
+							aDom.setAttribute("latte-html", "{{title}}");
+						var liDom = cd("li");
+						li.setAttribute("latte-click", "click");
+						li.setAttribute("latte-class", "{!disabled? disabled:!} {! active? active:!}")
+						liDom.appendChild(aDom);
+					var ulDom = cd("ul");
+					ulDom.setAttribute("latte-list", "list");
+					ulDom.className = "nav nav-tabs";
+					ulDom.appendChild(li);
+					
+						var contentDom = cd();
+						contentDom.className = "tab-pane active fadein-transition";
+						contentDom.setAttribute("latte-data", "content");
+						contentDom.setAttribute("latte-show", "active");
+					var tabsDom = cd("div");
+					tabsDom.className = "tab-content";
+					tabsDom.setAttribute("latte-list", "list");
+					tabsDom.appendChild(contentDom);
+				dom.appendChild(ulDom);
+				dom.appendChild(tabsDom);
+			var change = function(value, old) {
+				var Controller = require("../controller.js");
+				if(old) {
+					Controller.removeChild(dom, old);
+				}
+
+				Controller.create(dom, value);
+			};
+			change(data.get(tabs));
+			controller.bind("data", tabs, change);
+		}	
 	}
 }).call(module.exports);
 });
