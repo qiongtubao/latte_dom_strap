@@ -5,7 +5,10 @@ var latte_lib = latte.require("latte_lib");
 	carousel
 		{
 			interval: Number  5000
-      slide: String [prev, next]
+      slide: String [prev, next] 方向
+      list: Array {
+        
+      }
 		}
 */
   var data = latte_lib.object.create({

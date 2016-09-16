@@ -12,14 +12,15 @@ var latte_lib = latte.require("latte_lib");
     	select: 0,
     	list: [{
     		title: "a",
-
-    		data: {
-
+        html:"<p latte-html='{{text}}'></p>",
+    		content: {
+          text: "hello"
     		}
     	}, {
     		title: "b",
-    		data: {
-    			
+        html: "<p latte-html='{{text}}'></p>",
+    		content: {
+    			text: "fuck"
     		}
     	}]
 	},
