@@ -4,3 +4,8 @@
 .none {
 	display: none;
 }
+
+.mtransition {
+  -webkit-transition: all .5s ease;
+  transition: all .5s ease;
+}
